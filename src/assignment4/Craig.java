@@ -19,6 +19,7 @@ public class Craig extends Critter {
 			genes[k] = GENE_TOTAL / 8;
 		}
 		dir = Critter.getRandomInt(8);
+		
 	}
 	
 	public boolean fight(String not_used) { return true; }
@@ -27,7 +28,6 @@ public class Craig extends Critter {
 	public void doTimeStep() {
 		/* take one step forward */
 		walk(dir);
-		
 		if (getEnergy() > 150) {
 			Craig child = new Craig();
 			for (int k = 0; k < 8; k += 1) {

@@ -2,18 +2,20 @@ package assignment4;
 /* CRITTERS Main.java
  * EE422C Project 4 submission by
  * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
- * Slip days used: <0>
- * Fall 2016
+ * Jake Morrissey
+ * jmm9683
+ * 16345
+ * NO PARTNER
+ * Slip days used: 1
+ * Fall 2018
  */
 
 import java.util.Scanner;
+
+
+
 import java.io.*;
+import java.lang.reflect.Method;
 
 
 /*
@@ -66,11 +68,126 @@ public class Main {
         } else { // if no arguments to main
             kb = new Scanner(System.in); // use keyboard and console
         }
-
-        /* Do not alter the code above for your submission. */
-        /* Write your code below. */
+        /*
+         * "quit" will break the loop
+         * make,step,show,seed,stats commands
+         */
+        while(true) {
+        	System.out.print("critters>");
+        	String input = kb.nextLine();
+        	String[] inputs = input.split("\\s+");
+        	boolean validCommand = false;
+    		if (inputs[0].equals("quit")
+    				|| inputs[0].equals("show")
+    				|| inputs[0].equals("step")
+    				|| inputs[0].equals("seed")
+    				|| inputs[0].equals("make")
+    				|| inputs[0].equals("stats")) {
+    			validCommand = true;
+    		}
+        	if (input.equals("quit"))
+        		break;
+        	else if (input.equals("show"))
+        		Critter.displayWorld();
+        	else if (input.equals("step")) {
+        		try {
+					Critter.worldTimeStep();
+				} catch (InvalidCritterException e) {
+					e.printStackTrace();
+				}
+        	}
+        	//size two commands (step, seed, stats, make)
+        	else if (inputs.length == 2) {
+        		if (inputs[0].equals("step")) {
+        			try {
+        				int steps = Integer.parseInt(inputs[1]);
+        				while (steps > 0) {
+        					try {
+            					Critter.worldTimeStep();
+            				} catch (InvalidCritterException e) {
+            					e.printStackTrace();
+            				}
+        					steps--;
+        				}
+        			}
+        			catch(Exception e) {
+        				System.out.println("error processing: " + input);
+        			}	
+        		}
+        		else if (inputs[0].equals("seed")) {
+        			try {
+        				int seed = Integer.parseInt(inputs[1]);
+        				Critter.setSeed(seed);
+        			}
+        			catch(Exception e) {
+        				System.out.println("error processing: " + input);
+        			}	
+        		}
+        		else if (inputs[0].equals("stats")) {
+        			try {
+        				//accessing the subclasses runStats
+        				Critter testCrit = (Critter)Class.forName("assignment4." + inputs[1]).newInstance();
+						Method stats = testCrit.getClass().getMethod("runStats", java.util.List.class);
+						stats.invoke(testCrit, Critter.getInstances(inputs[1]));
+					} catch (Exception e) {
+						System.out.println("error processing: " + input);
+					}
+        		}
+        		else if (inputs[0].equals("make")) {
+        			try {
+        				Critter.makeCritter(inputs[1]);
+        			}
+        			catch(Exception e){
+        				System.out.println("error processing: " + input);
+        			}
+        			
+        		}
+        		else {
+        			if (validCommand) {
+        				System.out.println("error processing: " + input);
+        			}
+        			else{
+        				System.out.println("invalid command: " + input);
+        			}
+        		}
+        	}
+        	//size three commands (make)
+        	else if (inputs.length == 3) {
+        		if (inputs[0].equals("make")){
+        			try {
+        				int makes = Integer.parseInt(inputs[2]);
+        				while (makes > 0) {
+        					Critter.makeCritter(inputs[1]);
+        					makes--;
+        				}
+        			}
+        			catch(Exception e) {
+        				System.out.println("error processing: " + input);
+        			}
+        			
+        		}
+        		else {
+        			if (validCommand) {
+        				System.out.println("error processing: " + input);
+        			}
+        			else{
+        				System.out.println("invalid command: " + input);
+        			}
+        		}
+        	}
+        	//anything else is an error
+        	else
+        	{
+    			if (validCommand) {
+    				System.out.println("error processing: " + input);
+    			}
+    			else{
+    				System.out.println("invalid command: " + input);
+    			}
+        	}
+        	
         
-        // System.out.println("GLHF");
+        }
         
         /* Write your code above */
         System.out.flush();

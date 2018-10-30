@@ -2,17 +2,16 @@ package assignment4;
 /* CRITTERS Critter.java
  * EE422C Project 4 submission by
  * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
- * Slip days used: <0>
- * Fall 2016
+ * Jake Morrissey
+ * jmm9683
+ * 16345
+ * NO PARTNER
+ * Slip days used: 1
+ * Fall 2018
  */
 
 
+import java.util.Iterator;
 import java.util.List;
 import assignment4.Params;
 /* see the PDF for descriptions of the methods and fields in this class
@@ -49,17 +48,266 @@ public abstract class Critter {
 	
 	private int x_coord;
 	private int y_coord;
+	private boolean moved;
+	private static boolean fighting;
 	
+	/*
+	 * walking method
+	 * direction ranges from 0-7
+	 * must check if critter has already moved during this worldStep
+	 * must check if this is a fighting call - need to confirm new location is empty
+	 * regardless- subtract walking energy
+	 */
 	protected final void walk(int direction) {
+		if (fighting && !moved) {
+			/**
+			 * try to move to the specified location if 
+			 */
+			boolean empty = true;
+			int temp_x_coord = x_coord;
+			int temp_y_coord = y_coord;
+			if (direction == 0) {
+				temp_x_coord += 1;
+			}
+			if (direction == 1) {
+				temp_x_coord += 1;
+				temp_y_coord -= 1;
+			}
+			if (direction == 2) {
+				temp_y_coord -= 1;
+			}
+			if (direction == 3) {
+				temp_x_coord -= 1;
+				temp_y_coord -= 1;
+			}
+			if (direction == 4) {
+				temp_x_coord -= 1;
+			}
+			if (direction == 5) {
+				temp_x_coord -= 1;
+				temp_y_coord += 1;
+			}
+			if (direction == 6) {
+				temp_y_coord += 1;
+			}
+			if (direction == 7) {
+				temp_x_coord += 1;
+				temp_y_coord += 1;
+			}
+			if (temp_x_coord >= Params.world_width) {
+				temp_x_coord -= Params.world_width;
+			}
+			else if (temp_x_coord < 0) {
+				temp_x_coord += Params.world_width;
+			}
+			if (temp_y_coord >= Params.world_height) {
+				temp_y_coord -= Params.world_height;
+			}
+			else if (temp_y_coord < 0) {
+				temp_y_coord += Params.world_height;
+			}
+			for (Critter crit : population) {
+				if (crit.x_coord == temp_x_coord
+						&& crit.y_coord == temp_y_coord) {
+					empty = false; 
+					break;
+				}
+			}
+			if (empty) {
+				x_coord = temp_x_coord;
+				y_coord = temp_y_coord;
+			}
+			
+		}
+
+		else if (!moved){
+			if (direction == 0) {
+				x_coord += 1;
+			}
+			if (direction == 1) {
+				x_coord += 1;
+				y_coord -= 1;
+			}
+			if (direction == 2) {
+				y_coord -= 1;
+			}
+			if (direction == 3) {
+				x_coord -= 1;
+				y_coord -= 1;
+			}
+			if (direction == 4) {
+				x_coord -= 1;
+			}
+			if (direction == 5) {
+				x_coord -= 1;
+				y_coord += 1;
+			}
+			if (direction == 6) {
+				y_coord += 1;
+			}
+			if (direction == 7) {
+				x_coord += 1;
+				y_coord += 1;
+			}
+	
+		}
+
+		if (x_coord >= Params.world_width) {
+			x_coord -= Params.world_width;
+		}
+		else if (x_coord < 0) {
+			x_coord += Params.world_width;
+		}
+		if (y_coord >= Params.world_height) {
+			y_coord -= Params.world_height;
+		}
+		else if (y_coord < 0) {
+			y_coord += Params.world_height;
+		}
+
+		energy -= Params.walk_energy_cost;
+		moved = true;
+		
 		
 	}
-	
+	/*
+	 * run method- similar to walking
+	 * When fighting - need to check itself if location is safe because it can go through critters when running
+	 * Need to make sure critter has not moved yet
+	 * When not fighting - do walk twice with the same location
+	 * Adjust energy with run_energy
+	 * 
+	 */
 	protected final void run(int direction) {
-		walk(direction);
-		walk(direction);
+		int current_energy = energy;
+		if(fighting && !moved) {
+			boolean empty = true;
+			int temp_x_coord = x_coord;
+			int temp_y_coord = y_coord;
+			if (direction == 0) {
+				temp_x_coord += 2;
+			}
+			if (direction == 1) {
+				temp_x_coord += 2;
+				temp_y_coord -= 2;
+			}
+			if (direction == 2) {
+				temp_y_coord -= 2;
+			}
+			if (direction == 3) {
+				temp_x_coord -= 2;
+				temp_y_coord -= 2;
+			}
+			if (direction == 4) {
+				temp_x_coord -= 2;
+			}
+			if (direction == 5) {
+				temp_x_coord -= 2;
+				temp_y_coord += 2;
+			}
+			if (direction == 6) {
+				temp_y_coord += 2;
+			}
+			if (direction == 7) {
+				temp_x_coord += 2;
+				temp_y_coord += 2;
+			}
+			if (temp_x_coord >= Params.world_width) {
+				temp_x_coord -= Params.world_width;
+			}
+			else if (temp_x_coord < 0) {
+				temp_x_coord += Params.world_width;
+			}
+			if (temp_y_coord >= Params.world_height) {
+				temp_y_coord -= Params.world_height;
+			}
+			else if (temp_y_coord < 0) {
+				temp_y_coord += Params.world_height;
+			}
+			for (Critter crit : population) {
+				if (crit.x_coord == temp_x_coord
+						&& crit.y_coord == temp_y_coord) {
+					empty = false; 
+					break;
+				}
+			}
+			if (empty) {
+				x_coord = temp_x_coord;
+				y_coord = temp_y_coord;
+			}
+			
+			
+		}
+		else if (!moved){
+			walk(direction);
+			moved = false;
+			walk(direction);
+			
+		}
+		energy = current_energy - Params.run_energy_cost;
+		moved = true;
+
+		
 	}
-	
+	/*
+	 * Reproduce if there is enough energy
+	 * add new offspring to babies list, (add to population at end of timestep)
+	 * must set coordinate according to direction input and parent coordinates
+	 * must set energy of parent and baby to half of parent (rounding up and down respectively)
+	 */
 	protected final void reproduce(Critter offspring, int direction) {
+		if (energy < Params.min_reproduce_energy) {
+			return;
+		}
+		offspring.energy = energy/2;
+		energy = energy - offspring.energy;
+		if (direction == 0) {
+			offspring.x_coord = x_coord+1;
+			offspring.y_coord = y_coord;
+		}
+		if (direction == 1) {
+			offspring.x_coord = x_coord+1;
+			offspring.y_coord = y_coord-1;
+		}
+		if (direction == 2) {
+			offspring.x_coord = x_coord;
+			offspring.y_coord = y_coord-1;
+			
+		}
+		if (direction == 3) {
+			offspring.x_coord = x_coord-1;
+			offspring.y_coord = y_coord-1;
+		}
+		if (direction == 4) {
+			offspring.x_coord = x_coord-1;
+			offspring.y_coord = y_coord;
+		}
+		if (direction == 5) {
+			offspring.x_coord = x_coord-1;
+			offspring.y_coord = y_coord+1;
+		}
+		if (direction == 6) {
+			offspring.x_coord = x_coord;
+			offspring.y_coord = y_coord+1;
+		}
+		if (direction == 7) {
+			offspring.x_coord = x_coord+1;
+			offspring.y_coord = y_coord+1;
+		}
+		if (offspring.x_coord >= Params.world_width) {
+			offspring.x_coord -= Params.world_width;
+		}
+		else if (offspring.x_coord < 0) {
+			offspring.x_coord += Params.world_width;
+		}
+		if (offspring.y_coord >= Params.world_height) {
+			offspring.y_coord -= Params.world_height;
+		}
+		else if (offspring.y_coord < 0) {
+			offspring.y_coord += Params.world_height;
+		}
+		babies.add(offspring);
+		
 	}
 
 	public abstract void doTimeStep();
@@ -77,13 +325,16 @@ public abstract class Critter {
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
 		try {
-			Critter newCrit = (Critter)Class.forName("assignment4.Critter." + critter_class_name).newInstance();
-			population.add(newCrit);
+			Critter newCrit = (Critter)Class.forName("assignment4." + critter_class_name).newInstance();
 			newCrit.x_coord = getRandomInt(Params.world_width);
 			newCrit.y_coord = getRandomInt(Params.world_height);
 			newCrit.energy = Params.start_energy;
+			population.add(newCrit);
 		}
 		catch(Exception e) {
+			throw new InvalidCritterException(critter_class_name);
+		}
+		catch (NoClassDefFoundError e) {
 			throw new InvalidCritterException(critter_class_name);
 		}
 		
@@ -98,7 +349,18 @@ public abstract class Critter {
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		List<Critter> result = new java.util.ArrayList<Critter>();
-	
+		try {
+			Critter testCrit = (Critter)Class.forName("assignment4." + critter_class_name).newInstance();
+			
+			for (Critter crit : population) {
+				if (crit.getClass() == testCrit.getClass()) {
+					result.add(crit);
+				}
+			}
+		}
+		catch(Exception e) {
+			throw new InvalidCritterException(critter_class_name);
+		}
 		return result;
 	}
 	
@@ -184,26 +446,126 @@ public abstract class Critter {
 	public static void clearWorld() {
 		population.clear();
 	}
-	
-	public static void worldTimeStep() {
-		for (Critter crit : population) {
-			crit.doTimeStep();
+	/*
+	 * loop through all critters and execute their timestep and subtract rest energy
+	 * find living critters that are the same spot and have them fight
+	 * add babies
+	 * resuply the algae
+	 * remove dead critters
+	 */
+	public static void worldTimeStep() throws InvalidCritterException {
+		//doTimeStep
+		for (int i = population.size()-1; i >= 0; i--) {
+			population.get(i).moved = false;
+			population.get(i).doTimeStep();
+			population.get(i).energy -= Params.rest_energy_cost;
+			//System.out.println(population.get(i).toString() + " energy low: " + population.get(i).energy);
+		}
+		//fighting
+		fighting = true;
+		for (int i = population.size()-1; i>=0; i--) {
+			for (int j = population.size()-1; j>=0; j--) {
+				if (j != i 
+						&& population.get(j).x_coord == population.get(i).x_coord
+						&& population.get(j).y_coord == population.get(i).y_coord
+						&& population.get(i).energy > 0
+						&& population.get(j).energy > 0) {
+					boolean iFight = population.get(i).fight(population.get(j).toString());
+					boolean jFight = population.get(j).fight(population.get(i).toString());
+					//System.out.println("FIGHT");
+					if (population.get(j).x_coord == population.get(i).x_coord
+							&& population.get(j).y_coord == population.get(j).y_coord
+							&& population.get(i).energy > 0
+							&& population.get(j).energy > 0) {
+						//both roll to see who kills
+						if (iFight && jFight) {
+							int iRoll = getRandomInt(population.get(i).energy);
+							int jRoll = getRandomInt(population.get(j).energy);
+							if (iRoll >= jRoll) {
+								population.get(i).energy += (population.get(j).energy/2);
+								population.get(j).energy = -1;
+							}
+							else {
+								population.get(j).energy += (population.get(i).energy/2);
+								population.get(i).energy = -1;
+								
+							}
+							
+						}
+						//i kills
+						else if (iFight && !jFight) {
+							population.get(i).energy += (population.get(j).energy/2);
+							population.get(j).energy = -1;
+							
+						}
+						//j kills
+						else if (!iFight && jFight) {
+							population.get(j).energy += (population.get(i).energy/2);
+							population.get(i).energy = -1;
+							
+						}
+						//both don't want to fight - i defaults as killer
+						else if (!iFight && !jFight) {
+							population.get(i).energy += (population.get(j).energy/2);
+							population.get(j).energy = -1;	
+						}
+						
+					}	
+				}
+			}
+		}
+		//End of fighting
+		fighting = false;
+		
+		//add the offspring
+		population.addAll(babies);
+		babies.clear();
+		
+		//cull the dead
+		int algaeCount = 0;
+		for (int i = population.size()-1; i>=0; i--) {
+			
+			if (population.get(i).toString().equals("@")) {
+				algaeCount++;
+			}
+			if (population.get(i).energy <= 0) {
+				if (population.get(i).toString().equals("@")) {
+					algaeCount--;
+				}
+				population.remove(i);
+			}
+		}
+		//System.out.println(algaeCount);
+		//refresh algae
+		while(algaeCount < Params.refresh_algae_count) {
+			try{
+				makeCritter("Algae");
+			}
+			catch (Exception e) {
+				throw new InvalidCritterException("Algae failed to refresh"); 
+			}
+			algaeCount++;
+			
 		}
 	}
-	
+	/*
+	 * display world according to width and height
+	 * if critter is location display its toString()
+	 */
 	public static void displayWorld() {
 		System.out.print("+");
 		for (int i = 0; i < Params.world_width; i++){
 			System.out.print("-");
 		}
 		System.out.println("+");
-		for (int i = 0; i < Params.world_width; i++) {
+		for (int j = 0; j < Params.world_height; j++) {
 			System.out.print("|");
-			for (int j = 0; j < Params.world_height; j++) {
+			for (int i = 0; i < Params.world_width; i++) {
 				int critFound = 0;
 				for (Critter c: population) {
 					if (c.x_coord == i && c.y_coord == j) {
-						c.toString();
+						System.out.print(c.toString());
+						
 						critFound = 1;
 						break;
 					}
